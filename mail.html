@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Apro la mail</title>
+<style>
+  :root{color-scheme:light dark;--bg:#eef2fa;--ink:#0f1b3d;--muted:#5a6788}
+  @media (prefers-color-scheme:dark){:root{--bg:#0a1330;--ink:#e8edfb;--muted:#9eabd0}}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;box-sizing:border-box}
+  main{max-width:420px;text-align:center}
+  a.btn{display:inline-block;margin-top:14px;padding:14px 22px;border-radius:14px;color:#fff;font-weight:800;text-decoration:none;background:linear-gradient(90deg,#c026d3,#7c3aed)}
+  p{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <h1 style="font-size:1.3rem">Apro la conversazione…</h1>
+  <p id="msg">Se non si apre da sola, tocca il pulsante.</p>
+  <a class="btn" id="vai" href="https://mail.google.com/">Apri in Gmail</a>
+</main>
+<script>
+/* Pagina di rimando del Second brain di Luca.
+   Sul telefono un link a mail.google.com toccato direttamente viene preso dall'app Gmail, che apre solo la posta in arrivo.
+   Arrivando qui e reindirizzando senza tocco, la conversazione si apre nel browser, dove Gmail la trova.
+   Accetta solo indirizzi di Gmail: qualsiasi altro viene ignorato. */
+(function(){
+  var p = new URLSearchParams(location.search).get("l") || "";
+  if (!/^https:\/\/mail\.google\.com\/mail\//.test(p)) {
+    document.getElementById("msg").textContent = "Collegamento non valido: apro Gmail.";
+    return;
+  }
+  document.getElementById("vai").href = p;
+  location.replace(p);
+})();
+</script>
+</body>
+</html>
