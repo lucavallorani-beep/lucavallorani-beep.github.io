@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Second brain</title>
+<meta name="theme-color" content="#5b2bb5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icona.png">
+<link rel="apple-touch-icon" href="icona.png">
+<meta name="apple-mobile-web-app-title" content="Second brain">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{--a:#5b2bb5;--b:#2c5fd6}
+  html,body{height:100%;margin:0}
+  body{font-family:"Segoe UI",system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;padding:24px;box-sizing:border-box}
+  main{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center}
+  img{width:132px;height:132px;border-radius:30px;box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}
+  h1{margin:0;font-size:1.7rem}
+  p{margin:0;line-height:1.5;color:#e4e9ff}
+  a.btn{display:inline-block;padding:14px 22px;border-radius:14px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(90deg,#c026d3,#7c3aed)}
+  ol{text-align:left;margin:0;padding-left:20px;line-height:1.6;color:#e4e9ff}
+</style>
+</head>
+<body>
+<main>
+  <img src="icona.png" alt="">
+  <h1>Second brain</h1>
+  <p id="msg">Ti porto al tuo second brain…</p>
+  <a class="btn" id="apri" href="https://claude.ai/artifact/XimeaCYUJQopEuTyLZ9MrC">Apri il second brain</a>
+  <ol id="istr" hidden>
+    <li>Tocca i tre puntini ⋮ di Chrome in alto a destra.</li>
+    <li>Scegli <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>).</li>
+    <li>Conferma: sulla Home compare questa icona.</li>
+  </ol>
+</main>
+<script>
+  // Aperta dall'icona della Home (start_url con ?app=1 o modalità app): vai subito al second brain.
+  var app = /[?&]app=1/.test(location.search) || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  if (app) { location.replace("https://claude.ai/artifact/XimeaCYUJQopEuTyLZ9MrC"); }
+  else { document.getElementById("msg").textContent = "Aggiungi questa pagina alla schermata Home per avere l'icona del second brain."; document.getElementById("istr").hidden = false; }
+</script>
+</body>
+</html>

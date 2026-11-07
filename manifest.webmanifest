@@ -1,0 +1,12 @@
+{
+  "name": "Second brain",
+  "short_name": "Second brain",
+  "start_url": "./?app=1",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#5b2bb5",
+  "theme_color": "#5b2bb5",
+  "icons": [
+    { "src": "icona.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
