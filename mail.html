@@ -6,33 +6,68 @@
 <meta name="robots" content="noindex">
 <title>Apro la mail</title>
 <style>
-  :root{color-scheme:light dark;--bg:#eef2fa;--ink:#0f1b3d;--muted:#5a6788}
-  @media (prefers-color-scheme:dark){:root{--bg:#0a1330;--ink:#e8edfb;--muted:#9eabd0}}
+  :root{color-scheme:light dark;--bg:#eef2fa;--ink:#0f1b3d;--muted:#5a6788;--card:#fff;--line:#d5dcec}
+  @media (prefers-color-scheme:dark){:root{--bg:#0a1330;--ink:#e8edfb;--muted:#9eabd0;--card:#121d45;--line:#26346a}}
   body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;box-sizing:border-box}
-  main{max-width:420px;text-align:center}
-  a.btn{display:inline-block;margin-top:14px;padding:14px 22px;border-radius:14px;color:#fff;font-weight:800;text-decoration:none;background:linear-gradient(90deg,#c026d3,#7c3aed)}
-  p{color:var(--muted)}
+  main{width:100%;max-width:440px;text-align:center}
+  h1{font-size:1.25rem;margin:0 0 6px}
+  p{color:var(--muted);margin:6px 0}
+  .ogg{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:12px 0;font-weight:700;word-break:break-word}
+  a.btn,button.btn{display:block;width:100%;box-sizing:border-box;margin:10px 0 2px;padding:14px 16px;border-radius:14px;border:0;color:#fff;font:800 1rem system-ui,sans-serif;text-decoration:none;cursor:pointer;background:linear-gradient(90deg,#c026d3,#7c3aed)}
+  .alt{background:var(--card)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+  small{display:block;color:var(--muted);font-size:.82rem;margin-bottom:6px}
 </style>
 </head>
 <body>
 <main>
-  <h1 style="font-size:1.3rem">Apro la conversazione…</h1>
+  <h1 id="tit">Apro la conversazione…</h1>
   <p id="msg">Se non si apre da sola, tocca il pulsante.</p>
-  <a class="btn" id="vai" href="https://mail.google.com/">Apri in Gmail</a>
+  <div id="telefono" hidden>
+    <div class="ogg" id="ogg" hidden></div>
+    <a class="btn" id="b1" href="#">1 · Conversazione nel browser</a>
+    <small>Pagina semplice con tutti i messaggi del thread</small>
+    <a class="btn alt" id="b2" href="#">2 · Gmail completo nel browser</a>
+    <small>Gmail normale, aperto sulla conversazione</small>
+    <a class="btn alt" id="b3" href="#">3 · App Gmail e cerco l'oggetto</a>
+    <small>Copio l'oggetto: nell'app tocca la ricerca e incolla</small>
+  </div>
+  <a class="btn" id="vai" href="https://mail.google.com/" hidden>Apri in Gmail</a>
 </main>
 <script>
 /* Pagina di rimando del Second brain di Luca.
-   Sul telefono un link a mail.google.com toccato direttamente viene preso dall'app Gmail, che apre solo la posta in arrivo.
-   Arrivando qui e reindirizzando senza tocco, la conversazione si apre nel browser, dove Gmail la trova.
+   Computer: apre subito la conversazione in Gmail.
+   Telefono: l'app Gmail intercetta gli indirizzi mail.google.com e apre solo la posta in arrivo,
+   quindi qui si forza il browser (Chrome su Android, Safari su iPhone) con tre metodi da provare.
    Accetta solo indirizzi di Gmail: qualsiasi altro viene ignorato. */
 (function(){
-  var p = new URLSearchParams(location.search).get("l") || "";
-  if (!/^https:\/\/mail\.google\.com\/mail\//.test(p)) {
-    document.getElementById("msg").textContent = "Collegamento non valido: apro Gmail.";
-    return;
+  var q = new URLSearchParams(location.search);
+  var l = q.get("l") || "", s = (q.get("s") || "").slice(0, 300);
+  var $ = function(id){ return document.getElementById(id); };
+  if (!/^https:\/\/mail\.google\.com\/mail\//.test(l)) {
+    $("msg").textContent = "Collegamento non valido: apro Gmail."; $("vai").hidden = false; return;
   }
-  document.getElementById("vai").href = p;
-  location.replace(p);
+  var ua = navigator.userAgent, android = /Android/i.test(ua), ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  if (!android && !ios) { $("vai").href = l; $("vai").hidden = false; location.replace(l); return; }
+
+  // Conversazione in vista stampa: nessun "#" nell'indirizzo, quindi si può passare al browser
+  var acc = (l.match(/authuser=([^&#]+)/) || [])[1] || "0";
+  var th = (l.match(/thread-[af]:[^|&#]+/) || [])[0];
+  var stampa = th ? "https://mail.google.com/mail/u/0/?authuser=" + acc + "&view=pt&search=all&permthid=" + encodeURIComponent(th) : l;
+
+  function nelBrowser(u){
+    if (ios) return "x-safari-" + u;                                  // apre Safari invece dell'app Gmail
+    var senza = u.replace(/^https:\/\//, "");
+    if (u.indexOf("#") < 0) return "intent://" + senza + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(u) + ";end";
+    return "googlechrome://navigate?url=" + encodeURIComponent(u);     // Chrome con l'indirizzo completo
+  }
+  $("tit").textContent = "Apri la conversazione";
+  $("msg").textContent = "Scegli come aprirla. Dimmi quale funziona: terrò solo quella.";
+  $("telefono").hidden = false;
+  if (s) { $("ogg").textContent = s; $("ogg").hidden = false; }
+  $("b1").href = nelBrowser(stampa);
+  $("b2").href = nelBrowser(l);
+  $("b3").href = ios ? "googlegmail://" : "intent://#Intent;package=com.google.android.gm;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end";
+  $("b3").addEventListener("click", function(){ if (s && navigator.clipboard) navigator.clipboard.writeText(s).catch(function(){}); });
 })();
 </script>
 </body>
